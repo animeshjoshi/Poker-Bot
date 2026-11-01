@@ -8,9 +8,10 @@ Expected profit will be used to determine decision as well as opponents decision
 
 """
 
-def calculate_winprob(your_cards, community_cards, num_opponents = 5, iterations = 10000):
+def calculate_winprob(your_cards, community_cards, players, num_opponents = 5, iterations = 10000):
     import eval7
     import random
+    num_opponents = count_players(players)
     my_cards = [eval7.Card(c) for c in your_cards]
     board = [eval7.Card(c) for c in community_cards]
     deck = eval7.Deck()
@@ -57,6 +58,37 @@ def evaluate_hand(your_cards, community_cards):
     import eval7
     cards = your_cards + community_cards
     return eval7.evaluate(cards)
+
+def count_players(players):
+    counter = 0
+    for x in range(0, len(players)):
+        if players[x]['state'] == 'active':
+            counter += 1
+
+
+def make_decisions(estimated_equity, pot, amount_owed, stack, players):
+    n_players = count_players(players)
+    ev = {}
+
+    # Fold
+    if amount_owed > 0:
+        ev["fold"] = 0
+        ev["check"] = estimated_equity * pot
+
+
+
+    # Call
+    if amount_owed > 0:
+        call_amount = min(amount_owed, stack)
+        ev["call"] = (
+            estimated_equity * (pot + call_amount)
+            - call_amount
+        )
+
+    return ev
+
+
+
 
 
 if __name__ == "__main__":
